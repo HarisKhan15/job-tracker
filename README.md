@@ -16,12 +16,21 @@ Personal job application tracker. Spring Boot 3.5 (Java 21) backend, Angular 22 
 
 **Backend** (uses a local H2 file database in `backend/data`, nothing to install):
 
+First set your local login. Copy the example file and put your own username and password in it:
+
+```bash
+cd backend/src/main/resources
+cp application-local.properties.example application-local.properties
+```
+
+`application-local.properties` is git-ignored, so your login stays on your machine. Then:
+
 ```bash
 cd backend
 mvn spring-boot:run
 ```
 
-Default login: `haris` / `changeme`.
+The app will not start if no username/password is configured. This is on purpose, so it can never run on the internet with a default password.
 
 **Frontend** (hot reload, proxies `/api` to port 8080):
 
@@ -95,8 +104,8 @@ Every `git push` to `main` redeploys automatically.
 
 | Env variable   | Default                          | Meaning                    |
 |----------------|----------------------------------|----------------------------|
-| `APP_USERNAME` | `haris`                          | Login username             |
-| `APP_PASSWORD` | `changeme`                       | Login password             |
+| `APP_USERNAME` | none, required                   | Login username             |
+| `APP_PASSWORD` | none, required                   | Login password             |
 | `DB_URL`       | H2 file in `./data`              | JDBC URL of the database   |
 | `DB_USER`      | `sa`                             | Database user              |
 | `DB_PASSWORD`  | (empty)                          | Database password          |

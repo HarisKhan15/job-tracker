@@ -1,0 +1,6 @@
+# Local-only settings. Copy this file to "application-local.properties"
+# in the same folder and fill in your own values.
+# application-local.properties is in .gitignore, so it never reaches GitHub.
+
+app.username=your-username
+app.password=your-local-password

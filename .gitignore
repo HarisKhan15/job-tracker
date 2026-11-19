@@ -8,3 +8,8 @@ data/
 .vscode/
 .DS_Store
 backend/src/main/resources/static/
+
+# Local secrets (never commit)
+application-local.properties
+.env
+*.env

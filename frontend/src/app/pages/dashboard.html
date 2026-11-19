@@ -1,0 +1,123 @@
+<header class="topbar">
+  <div class="brand"><span class="logo">JT</span><span>Job Tracker</span></div>
+  <div class="top-actions">
+    <button class="btn ghost hide-sm" (click)="exportCsv()" title="Download all as CSV">Export</button>
+    <button class="btn ghost" (click)="auth.logout()">Log out</button>
+  </div>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <div>
+      <h1>Your applications</h1>
+      <p class="muted">
+        {{ apps().length }} total · {{ active() }} waiting for an answer
+        @if (followUpCount() > 0) { · <span class="warn-text">{{ followUpCount() }} to follow up</span> }
+      </p>
+    </div>
+    <button class="btn primary big-btn" (click)="openNew()">+ Add application</button>
+  </section>
+
+  <!-- Status chips double as filters -->
+  <div class="chips">
+    <button class="chip" [class.on]="statusFilter() === 'ALL'" (click)="statusFilter.set('ALL')">
+      All <b>{{ apps().length }}</b>
+    </button>
+    @for (s of statuses; track s.value) {
+      <button class="chip s-{{ s.value }}" [class.on]="statusFilter() === s.value" (click)="statusFilter.set(s.value)">
+        {{ s.label }} <b>{{ counts()[s.value] }}</b>
+      </button>
+    }
+    @if (followUpCount() > 0) {
+      <button class="chip follow" [class.on]="statusFilter() === 'FOLLOW_UP'" (click)="statusFilter.set('FOLLOW_UP')">
+        ⏰ Follow up <b>{{ followUpCount() }}</b>
+      </button>
+    }
+  </div>
+
+  <div class="toolbar">
+    <input class="search" type="search" placeholder="Search company, role, notes…"
+           [ngModel]="search()" (ngModelChange)="search.set($event)" />
+    <select [ngModel]="typeFilter()" (ngModelChange)="typeFilter.set($event)" aria-label="Filter by type">
+      <option value="ALL">All types</option>
+      @for (t of types; track t.value) { <option [value]="t.value">{{ t.label }}</option> }
+    </select>
+    <select [ngModel]="sort()" (ngModelChange)="sort.set($event)" aria-label="Sort">
+      <option value="updated">Recently changed</option>
+      <option value="applied">Applied date</option>
+      <option value="company">Company A–Z</option>
+    </select>
+  </div>
+
+  @if (loading()) {
+    <div class="empty"><div class="spinner"></div><p class="muted">Loading… (the free server may need a moment to wake up)</p></div>
+  } @else if (loadError()) {
+    <div class="empty">
+      <p>Could not load your applications.</p>
+      <button class="btn" (click)="load()">Try again</button>
+    </div>
+  } @else if (apps().length === 0) {
+    <div class="empty">
+      <p class="empty-title">No applications yet</p>
+      <p class="muted">Add the first one, it takes 10 seconds. Only company and position are required.</p>
+      <button class="btn primary" (click)="openNew()">+ Add application</button>
+    </div>
+  } @else if (filtered().length === 0) {
+    <div class="empty"><p class="muted">Nothing matches this filter.</p></div>
+  } @else {
+    <ul class="list">
+      @for (a of filtered(); track a.id) {
+        <li class="card item" [class.due]="followUpDue(a)">
+          <div class="item-main" (click)="toggle(a)">
+            <div class="item-title">
+              <span class="company">{{ a.company }}</span>
+              <span class="badge">{{ typeLabel(a.type) }}</span>
+              @if (followUpDue(a)) { <span class="badge warn">Follow up</span> }
+            </div>
+            <div class="position">{{ a.position }}</div>
+            <div class="meta">
+              @if (a.location) { <span>📍 {{ a.location }}</span> }
+              @if (a.appliedDate) { <span title="{{ formatDate(a.appliedDate) }}">Applied {{ daysAgo(a.appliedDate) }}</span> }
+              @if (a.jobUrl) {
+                <a [href]="a.jobUrl" target="_blank" rel="noopener" (click)="$event.stopPropagation()">Job post ↗</a>
+              }
+            </div>
+          </div>
+
+          <div class="item-side">
+            <select class="status-select s-{{ a.status }}" [ngModel]="a.status"
+                    (ngModelChange)="changeStatus(a, $event)" aria-label="Status">
+              @for (s of statuses; track s.value) { <option [value]="s.value">{{ s.label }}</option> }
+            </select>
+            <div class="row-actions">
+              <button class="icon-btn" (click)="openEdit(a)" title="Edit">✎</button>
+              <button class="icon-btn danger" (click)="remove(a)" title="Delete">🗑</button>
+            </div>
+          </div>
+
+          @if (expandedId() === a.id) {
+            <div class="details">
+              @if (a.appliedDate) { <div><span class="muted">Applied</span> {{ formatDate(a.appliedDate) }}</div> }
+              @if (a.followUpDate) { <div><span class="muted">Follow up</span> {{ formatDate(a.followUpDate) }}</div> }
+              @if (a.contactPerson || a.contactEmail) {
+                <div><span class="muted">Contact</span> {{ a.contactPerson }}
+                  @if (a.contactEmail) { <a href="mailto:{{ a.contactEmail }}">{{ a.contactEmail }}</a> }
+                </div>
+              }
+              @if (a.notes) { <div class="notes">{{ a.notes }}</div> }
+              @if (!a.notes && !a.contactPerson && !a.contactEmail && !a.followUpDate) {
+                <div class="muted">No extra details. Click ✎ to add notes.</div>
+              }
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  }
+</main>
+
+<button class="fab" (click)="openNew()" aria-label="Add application">+</button>
+
+@if (formOpen()) {
+  <app-application-form [existing]="editing()" (saved)="onSaved($event)" (closed)="formOpen.set(false)" />
+}

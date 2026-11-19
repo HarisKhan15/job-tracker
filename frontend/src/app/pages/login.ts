@@ -2,11 +2,13 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../core/auth.service';
+import { ThemeToggle } from '../components/theme-toggle';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule],
+  imports: [FormsModule, ThemeToggle],
   template: `
+    <div class="login-theme"><app-theme-toggle /></div>
     <div class="login-wrap">
       <form class="card login-card" (ngSubmit)="submit()">
         <div class="brand big">

@@ -1,6 +1,7 @@
 <header class="topbar">
   <div class="brand"><span class="logo">JT</span><span>Job Tracker</span></div>
   <div class="top-actions">
+    <app-theme-toggle />
     <button class="btn ghost hide-sm" (click)="exportCsv()" title="Download all as CSV">Export</button>
     <button class="btn ghost" (click)="auth.logout()">Log out</button>
   </div>

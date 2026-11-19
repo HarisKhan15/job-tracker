@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../core/api.service';
 import { AuthService } from '../core/auth.service';
 import { ApplicationForm } from '../components/application-form';
+import { ThemeToggle } from '../components/theme-toggle';
 import {
   ApplicationStatus, JOB_TYPES, JobApplication, JobType, STATUSES, statusLabel, typeLabel,
 } from '../core/models';
@@ -11,7 +12,7 @@ type SortKey = 'updated' | 'applied' | 'company';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [FormsModule, ApplicationForm],
+  imports: [FormsModule, ApplicationForm, ThemeToggle],
   templateUrl: './dashboard.html',
 })
 export class DashboardPage implements OnInit {
